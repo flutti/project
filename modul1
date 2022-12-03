@@ -1,0 +1,50 @@
+import requests
+import os
+import random
+from tkinter import *
+from PIL import ImageTk, Image
+from bs4 import BeautifulSoup
+
+window = Tk()
+width = window.winfo_screenwidth()
+height = window.winfo_screenheight()
+window.geometry(str(width) + 'x' + str(height))
+window.title('Фотообои')
+window.config(bg='white')
+
+w = width // 2
+h = height // 2
+
+def get_random_picture():
+    response = requests.get('https://www.wallpaperflare.com/search?wallpaper=1920x1080')
+    response = response.content
+    html = BeautifulSoup(response, 'html.parser')
+    picts = html.findAll(r'img')
+    spis = []
+    for pict in picts:
+        spis.append(pict.get('data-src'))
+    rp = random.choice(spis)
+
+    r = requests.get(rp)
+    with open("pythonn.gif", "wb") as code:
+        code.write(r.content)
+
+    photo = ImageTk.PhotoImage(Image.open("pythonn.gif"))  
+    l=Label(image = photo)
+    l.image = photo
+    l.place(width=width, height=height-146, x=0, y=0)
+
+def save():
+    os.rename('pythonn.gif', 'pythonn.jpeg')
+    window.destroy()
+
+button1 = Button(text='<---', command=get_random_picture)
+button1.place(width=80, height=80, x=w-80, y=height-146)
+
+button2 = Button(text='--->', command=get_random_picture)
+button2.place(width=80, height=80, x=w+80, y=height-146)
+
+button3 = Button(text='выбор', command=save)
+button3.place(width=80, height=80, x=w, y=height-146)
+
+window.mainloop()
